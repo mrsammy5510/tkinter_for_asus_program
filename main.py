@@ -14,6 +14,7 @@ video_home_bg = tk.PhotoImage(file = "video_home.png")
 
 
 
+
 monitor_height = root.winfo_screenheight()
 monitor_width = root.winfo_screenwidth()
 
@@ -23,15 +24,35 @@ canvas1.create_image( 0, 0, image = bg, anchor = "nw")      #nw代表前面的�
 canvas1.pack()
 windows_num = 0
 
-cpu_coe = 0.00264
-mem_coe = 0.002
+
 mem_spec = {0: 0.3,1: 0.15, 2: 0.08, 3: 0.02}      #From worst to best
 cpu_spec = {0: 0.16487,1: 0.10758, 2: 0.0534, 3: 0.002}
+
 
 root.title('Computer spec test')
 root.resizable(width=True, height=True)
 root.state('zoomed')        #啟動時最大化
 root.minsize(480, 270)      #最小是470X270
+
+
+#Displaying the memory selecting combo box
+mem_select = ttk.Combobox(root,value=["DDR3 8G","DDR4 8G","DDR3 16G","DDR4 16G"])
+mem_select.current(0)
+mem_select_canvas = canvas1.create_window(1700, 780,anchor = "nw",window = mem_select)
+
+#Displaying the CPU selecting combo box
+cpu_select = ttk.Combobox(root,value=["i3-12100","i5-12500","i7-12700","i9-12900"])
+cpu_select.current(0)
+cpu_select_canvas = canvas1.create_window(1700, 880,anchor = "nw",window = cpu_select)
+
+#Label to point out the RAM menu position
+memory_label_canvas = canvas1.create_text(1750, 730,anchor = "nw",text = "RAM", font=('Arial', 18), fill = 'white')
+
+#Label to point out the CPU menu position
+cpuLabelCanvas = canvas1.create_text(1750, 830,anchor = "nw",text = "CPU", font=('Arial', 18), fill = 'white')
+
+
+
 
 
 def explorer_click(event):
@@ -69,13 +90,54 @@ def explorer_click(event):
     canvas_brower.pack()
     
 def mp4_click(event):
+
+    which_mem = mem_select.current()        #抓現在選到哪個RAM
+    mem_coe = mem_spec.get(which_mem,0)     #用字典根據選到哪一個RAM 指派對應的coe給它
+    which_cpu = cpu_select.current()
+    cpu_coe = cpu_spec.get(which_cpu,0)
+
+    #create window
     third = tk.Toplevel()
     third.title("Exporting video")
-    third.geometry("640x360+640+360")
+    third.geometry("640x360+640+360")   #640X360 is the size, 640+360 is the position
+    #The progress bar
     canvas_video = tk.Canvas(third, width = 640, height = 360)
+    video_trans = ttk.Progressbar(third,length=320)
+    video_trans.pack(pady=20)
+    canvas_video.create_window(160, 302, anchor='nw', window = video_trans)
+
+    #Set the background for the video window
     canvas_video.pack(fill = "both", expand = True)
-    canvas_video.create_image( 0, 0, image = video_home_bg, anchor = "nw")      #nw代表前面的座標是左上角的點
+    canvas_video.create_image( 0, 0, image = video_home_bg, anchor = "nw")      #nw代表前面的座標是左上角的點'''
     canvas_video.pack()
+
+    val = 0
+    
+    #Updating the progress bar
+    for i in range(101):
+        video_trans['value'] = i
+        third.update()
+        timer = 0.01*(math.log(cpu_coe*500+mem_coe*100)+1)
+        time.sleep(timer)
+        
+        
+    #Show the total time consuming
+    val = timer*101
+    val = round(val,2)
+    canvas_video.create_text(226, 250,anchor = "nw",text = "共花了", font=('Arial', 18), fill = 'black')
+    canvas_video.create_text(300, 250,anchor = "nw",text = val, font=('Arial', 18), fill = 'black')
+    canvas_video.create_text(350, 250,anchor = "nw",text = "秒", font=('Arial', 18), fill = 'black')
+    
+    
+    
+    
+
+
+    
+    
+    
+    
+    
 
 #Displaying the explorer icon
 explorerIcon = Image.open('edge.png')
@@ -91,23 +153,9 @@ mp4_image = ImageTk.PhotoImage(mp4Icon)
 mp4 = canvas1.create_image(50, 130, image = mp4_image)
 canvas1.tag_bind(mp4, "<Button-1>", mp4_click)
 
-video_trans = ttk.Progressbar(root)
-video_trans.pack(pady=20)
-video_trans.start(100)
-video_trans_canvas = canvas1.create_window(900, 500, anchor='nw', window = video_trans)
 
-#Displaying the memory selecting combo box
-mem_select = ttk.Combobox(root,value=["DDR3 8G","DDR4 8G","DDR3 16G","DDR4 16G"])
-mem_select.current(0)
-mem_select_canvas = canvas1.create_window(1700, 780,anchor = "nw",window = mem_select)
 
-#Displaying the CPU selecting combo box
-cpu_select = ttk.Combobox(root,value=["i3-12100","i5-12500","i7-12700","i9-12900"])
-cpu_select.current(0)
-cpu_select_canvas = canvas1.create_window(1700, 980,anchor = "nw",window = cpu_select)
 
-#Label to point out the RAM menu position
-memory_label_canvas = canvas1.create_text(1750, 730,anchor = "nw",text = "RAM", font=('Arial', 18), fill = 'white')
 
 
 root.mainloop()
