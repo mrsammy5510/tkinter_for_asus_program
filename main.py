@@ -8,15 +8,25 @@ global brower_home_bg
 global video_home_bg
 
 root = tk.Tk()
-bg = tk.PhotoImage(file = "background.png")
-brower_home_bg = tk.PhotoImage(file = "brower_home.png")
-video_home_bg = tk.PhotoImage(file = "video_home.png")
-
-
-
-
 monitor_height = root.winfo_screenheight()
 monitor_width = root.winfo_screenwidth()
+
+img = Image.open("./image\\background.png")
+img = img.resize((monitor_width,monitor_height), Image.ANTIALIAS)
+bg = ImageTk.PhotoImage(img)
+brower_home_bg = tk.PhotoImage(file = "./image\\brower_home.png")
+video_home_bg = tk.PhotoImage(file = "./image\\video_home.png")
+
+
+
+
+
+
+'''height_scale = monitor_height/1080
+
+
+bg = bg.zoom(int(height_scale))
+bg = bg.subsample(int(height_scale))'''
 
 canvas1 = tk.Canvas( root, width = monitor_width, height = monitor_height)
 canvas1.pack(fill = "both", expand = True)
@@ -38,18 +48,22 @@ root.minsize(480, 270)      #最小是470X270
 #Displaying the memory selecting combo box
 mem_select = ttk.Combobox(root,value=["DDR3 8G","DDR4 8G","DDR3 16G","DDR4 16G"])
 mem_select.current(0)
-mem_select_canvas = canvas1.create_window(1700, 780,anchor = "nw",window = mem_select)
+#mem_select_canvas = canvas1.create_window(1700, 780,anchor = "nw",window = mem_select)
+mem_select_canvas = canvas1.create_window(monitor_width-220, monitor_height-300,anchor = "nw",window = mem_select)
 
 #Displaying the CPU selecting combo box
 cpu_select = ttk.Combobox(root,value=["i3-12100","i5-12500","i7-12700","i9-12900"])
 cpu_select.current(0)
-cpu_select_canvas = canvas1.create_window(1700, 880,anchor = "nw",window = cpu_select)
+#cpu_select_canvas = canvas1.create_window(1700, 880,anchor = "nw",window = cpu_select)
+cpu_select_canvas = canvas1.create_window(monitor_width-220, monitor_height-200,anchor = "nw",window = cpu_select)
 
 #Label to point out the RAM menu position
-memory_label_canvas = canvas1.create_text(1750, 730,anchor = "nw",text = "RAM", font=('Arial', 18), fill = 'white')
+#memory_label_canvas = canvas1.create_text(1750, 730,anchor = "nw",text = "RAM", font=('Arial', 18), fill = 'white')
+memory_label_canvas = canvas1.create_text(monitor_width-170, monitor_height-350,anchor = "nw",text = "RAM", font=('Arial', 18), fill = 'white')
 
 #Label to point out the CPU menu position
-cpuLabelCanvas = canvas1.create_text(1750, 830,anchor = "nw",text = "CPU", font=('Arial', 18), fill = 'white')
+#cpuLabelCanvas = canvas1.create_text(1750, 830,anchor = "nw",text = "CPU", font=('Arial', 18), fill = 'white')
+cpuLabelCanvas = canvas1.create_text(monitor_width-170, monitor_height-250,anchor = "nw",text = "CPU", font=('Arial', 18), fill = 'white')
 
 
 
@@ -64,7 +78,7 @@ def explorer_click(event):
     cpu_coe = cpu_spec.get(which_cpu,0)
 
     #用來顯示loading的GIF##############
-    loading_gif = Image.open('loading.gif')
+    loading_gif = Image.open('./image\\loading.gif')
     # GIF图片流的迭代器
     iter = ImageSequence.Iterator(loading_gif)
     #frame就是gif的每一帧，转换一下格式就能显示了
@@ -99,7 +113,7 @@ def mp4_click(event):
     #create window
     third = tk.Toplevel()
     third.title("Exporting video")
-    third.geometry("640x360+640+360")   #640X360 is the size, 640+360 is the position
+    third.geometry("640x360+%d+%d" %(monitor_width/2-320,monitor_height/2-180))   #640X360 is the size, 640+360 is the position
     #The progress bar
     canvas_video = tk.Canvas(third, width = 640, height = 360)
     video_trans = ttk.Progressbar(third,length=320)
@@ -140,14 +154,14 @@ def mp4_click(event):
     
 
 #Displaying the explorer icon
-explorerIcon = Image.open('edge.png')
+explorerIcon = Image.open('./image\\edge.png')
 explorerIcon.thumbnail((50,50))
 explorer_image = ImageTk.PhotoImage(explorerIcon)
 explorer = canvas1.create_image(50, 50, image = explorer_image)
 canvas1.tag_bind(explorer, "<Button-1>", explorer_click)
 
 #Displaying mp4 transistor icon
-mp4Icon = Image.open('mp4.png')
+mp4Icon = Image.open('./image\\mp4.png')
 mp4Icon.thumbnail((50,50))
 mp4_image = ImageTk.PhotoImage(mp4Icon)
 mp4 = canvas1.create_image(50, 130, image = mp4_image)
